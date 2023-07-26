@@ -1,0 +1,117 @@
+<html>
+
+<head>
+  <meta>
+  <title></title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('media', filename='run.ico') }}">
+
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer">  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
+
+  <link href="{{ url_for('static', filename='main.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='__cookies.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='___words.js') }}"></script>
+  <script src="{{ url_for('static', filename='___word_func.js') }}"></script>
+  <script src="{{ url_for('static', filename='___time_func.js') }}"></script>
+  <script src="{{ url_for('static', filename='helper.js') }}"></script>
+  <script src="{{ url_for('static', filename='recommand_system.js') }}"> phone = true</script>
+
+  <!-- <script src="{{ url_for('static', filename='__socket_blog.js') }}"></script> -->
+  <script src="{{ url_for('static', filename='__socket_tele.js') }}"></script>
+  <script src="{{ url_for('static', filename='__socket_twit.js') }}"></script>
+  <script src="{{ url_for('static', filename='__socket_mad.js') }}"></script>
+  <script src="{{ url_for('static', filename='__socket_volume.js') }}"></script>
+  <script src="{{ url_for('static', filename='__socket_oi.js') }}"></script>
+
+</head>
+
+<body>
+  <div id="time"></div>
+  <script>phone = true; main = false</script>
+  <div id="recommand" class="recommand_phone">
+    <div id="recommand_container"></div>
+  </div>
+
+  <div id="liq_tables" class="liq_phone">
+    <div id="volume_container" class="feed t_feed"></div>
+    <div id="oi_container" class="feed t_feed"></div>
+  </div>
+
+  <div id="feed_phone_header" class="feed_phone_header">
+    <div id="read_sw_wrwr">
+      <div id="read_switcher_wrap">
+        <div class="read_switcher" onclick="switch_read(this)" id="switcher_twit_news">💡</div>
+        <div class="read_switcher" onclick="switch_read(this)" id="switcher_tele_news">🗞️</div>
+        <div class="read_switcher" onclick="switch_read(this)" id="switcher_tele_alert">🐋</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="read" class="feed feed_read feed_phone">
+    <div id="read_container" class="msg_container"> </div>
+    <script>
+      function switch_read(ele) { //
+        document.querySelectorAll(".read_switcher").forEach(swt => {
+          if (swt == ele) {
+            if (ele.style.opacity == 1) { ele.style.opacity = .3 }
+            else if (ele.style.opacity == .3) { ele.style.opacity = 1 }
+          } else {
+            swt.style.opacity = .3
+          }
+        })
+        document.querySelectorAll("#read_container .feed_msg").forEach(msg => {
+          if (read_filter(msg)) { msg.style.display = "none" }
+          else { msg.style.display = "block" }
+        })
+        function read_filter(msg) {
+          _name = msg.className
+          if (ele.id == 'switcher_twit_news') { return !_name.includes('twit_Alert') && !_name.includes('madnews') }
+          else if (ele.id == 'switcher_alpha') { return !_name.includes('twit_Alpha') }
+          else if (ele.id == 'switcher_trader') { return !_name.includes('tele_TRADER') }
+          else if (ele.id == 'switcher_airdrop') { return !_name.includes('twit_Airdrop') }
+          else if (ele.id == 'switcher_tele_airdrop') { return !_name.includes('tele_AIRDROP') }
+          else if (ele.id == 'switcher_tele') { return !_name.includes('tele_FEED') }
+          else if (ele.id == 'switcher_kimchi') { return !_name.includes('tele_KIMCHI') }
+          else if (ele.id == 'switcher_thread') { return !_name.includes('twit_Thread') }
+          else if (ele.id == 'switcher_econ') { return !_name.includes('tele_ECON') }
+          // else if (ele.id == 'switcher_blog') { return !_name.includes('blog') }
+          else if (ele.id == 'switcher_tele_alert') { return !_name.includes('tele_ALERT') }
+          else if (ele.id == 'switcher_tele_news') { return !_name.includes('tele_NEWS') }
+
+          else if (ele.id == 'switcher_all') {
+            document.querySelectorAll(".read_switcher").forEach(sw => { sw.style.opacity = 1 })
+            document.querySelectorAll(".feed_msg").forEach(msg => { msg.style.display = "block" })
+          }
+        }
+        document.getElementById('read').scrollTop = 0
+      }
+
+    </script>
+  </div>
+
+  <div id="led_container" class="led_container_phone" style="display:flex; flex-wrap:nowrap;">
+    <div class="led" id="led_tele"></div>
+    <div class="led" id="led_volume"></div>
+    <div class="led" id="led_oi"></div>
+    <div class="led" id="led_madnews"></div>
+    <script>
+      ws_tele(); ws_madnews(); ws_volume(); ws_oi();
+    </script>
+  </div>
+
+</body>
+
+</html>

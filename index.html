@@ -1,0 +1,250 @@
+<html>
+
+<head>
+  <meta>
+  <title></title>
+  <link rel="icon" type="image/x-icon" href="media/run.ico">
+
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js"></script>
+
+  <link href="static/main.css" rel="stylesheet">
+
+  <script type="text/javascript" src="../static/cookies.js"></script>
+  <script type="text/javascript" src="../static/helper.js"></script>
+  <script type="text/javascript" src="../static/words.js"></script>
+  <script type="text/javascript" src="../static/word_func.js"></script>
+  <script type="text/javascript" src="../static/time_func.js"></script>
+  <script type="text/javascript" src="../static/note.js" defer></script>
+  <script type="text/javascript" src="../static/binance_candle.js"></script>
+  <script type="text/javascript" src="../static/multi_chart.js"></script>
+  <!-- <script type="text/javascript" src="../static/vol_spag.js"></script> -->
+  <script type="text/javascript" src="../static/get_taino.js"></script>
+
+  <script type="text/javascript" src="../static/socket_tele.js"></script>
+  <script type="text/javascript" src="../static/socket_twit.js"></script>
+  <script type="text/javascript" src="../static/socket_mad.js"></script>
+  <script type="text/javascript" src="../static/socket_volume.js"></script>
+  <script type="text/javascript" src="../static/socket_oi.js"></script>
+  <script type="text/javascript" src="../static/depth.js" defer></script>
+
+</head>
+
+<body>
+
+  <div id="recommand">
+    <div id="recommand_container"></div>
+    <script> phone = false; main = true; tf_global = 15; </script>
+    <script src="static/recommand_system.js"></script>
+  </div>
+
+  <div id="read" class="feed feed_read">
+    <div id="read_header">
+      <div id="read_sw_wrwr">
+        <div id="read_switcher_wrap">
+          <div class="read_switcher" onclick="switch_read(this)" id="switcher_twit_news">💡</div>
+          <div class="read_switcher" onclick="switch_read(this)" id="switcher_tele_news">🗞️</div>
+          <div class="read_switcher" onclick="switch_read(this)" id="switcher_tele_alert">🐋</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="read_container" class="msg_container"> </div>
+  </div>
+
+  <div id="time" class="time_read">
+    <div id="time_content" class="time_read"></div>
+    <div id="today_event"></div>
+    <script>clock()</script>
+  </div>
+
+  <div id="history_container"></div>
+
+  <div id="display_key"></div>
+
+  <!-- <div id="multi">
+    <div class="multi_column">
+      <div class="multi_row_">
+        <textarea id="multi_BTC">BTC</textarea>
+        <div id="chart_BTC"></div>
+      </div>
+      <div class="multi_row">
+        <div id="chart_0"></div>
+      </div>
+    </div>
+    <div class="multi_column">
+      <div class="multi_row_">
+        <textarea>ETH</textarea>
+        <div id="chart_ETH"></div>
+      </div>
+      <div class="multi_row">
+        <div id="chart_1"></div>
+      </div>
+    </div>
+    <div class="multi_column">
+      <div class="multi_row">
+        <div id="chart_2"></div>
+      </div>
+      <div class="multi_row">
+        <div id="chart_3"></div>
+      </div>
+    </div>
+    <div class="multi_column">
+      <div class="multi_row">
+        <div id="chart_4"></div>
+      </div>
+      <div class="multi_row">
+        <div id="chart_5"></div>
+      </div>
+    </div>
+  </div> -->
+
+  <div id="vol_chart_container">
+    <div id='vol_chart' class="chart" style="display:inline-block;"></div>
+  </div>
+
+  <div id="liq_tables">
+    <div id="volume_container" class="feed t_feed"></div>
+    <div id="oi_container" class="feed t_feed"></div>
+  </div>
+
+  <div id="note_app">
+    <div id="add_note" class="note">+</div>
+  </div>
+
+  <div id="tainoko" class="tainoko">
+    <img class="tainoko-thumb" id="taino_oi_thumb">
+    <img class="tainoko-thumb" id="taino_maker_thumb">
+    <!-- <img class="tainoko-thumb" id="taino_iv_thumb"> -->
+
+    <div class="taino_modal" id="taino_oi_wrap"> <img class="tainoko-full" id="taino_oi"> </div>
+    <div class="taino_modal" id="taino_maker_wrap"> <img class="tainoko-full" id="taino_maker"> </div>
+    <!-- <div class="taino_modal" id="taino_iv_wrap"> <img class="tainoko-full" id="taino_iv"> </div> -->
+
+  </div>
+
+  <div id="side_chart-wrapper">
+    <div id="side_charts" style="display:inline-block;">
+      <div class="chart popup_chart" id="oi_chart"></div>
+      <div class="chart popup_chart" id="side_chart_low_tf"></div>
+    </div>
+  </div>
+
+  <div id="led_container" style="display:flex; flex-wrap:nowrap;">
+    <div class="led" id="led_volume"></div>
+    <div class="led" id="led_oi"></div>
+    <div class="led" id="led_tele"></div>
+    <div class="led" id="led_madnews"></div>
+  </div>
+
+  <script>
+    ws_tele(); ws_madnews(); ws_volume(); ws_oi();
+    empty_popup_dblclick();
+      // draw_spx()
+  </script>
+
+  <script>
+    function switch_read(ele) { //
+      document.querySelectorAll(".read_switcher").forEach(swt => {
+        if (swt == ele) {
+          if (ele.style.opacity == 1) { ele.style.opacity = .3 }
+          else if (ele.style.opacity == .3) { ele.style.opacity = 1 }
+        } else {
+          swt.style.opacity = .3
+        }
+      })
+      document.querySelectorAll("#read_container .feed_msg").forEach(msg => {
+        if (read_filter(msg)) { msg.style.display = "none" }
+        else { msg.style.display = "block" }
+      })
+      function read_filter(msg) {
+        _name = msg.className
+        if (ele.id == 'switcher_twit_news') { return !_name.includes('twit_Alert') && !_name.includes('madnews') }
+        else if (ele.id == 'switcher_tele_alert') { return !_name.includes('tele_ALERT') }
+        else if (ele.id == 'switcher_tele_news') { return !_name.includes('tele_NEWS') }
+      }
+      document.getElementById('read').scrollTop = 0
+    }
+    document.querySelectorAll(".read_switcher").forEach(switcher => { // 우클릭
+      switcher.oncontextmenu = e => {
+        e.preventDefault()
+        document.querySelectorAll(".read_switcher").forEach(sw => { sw.style.opacity = 1 })
+        document.querySelectorAll(".feed_msg").forEach(msg => { msg.style.display = "block" })
+        document.getElementById('read').scrollTop = 0
+      }
+    })
+  </script>
+
+  <script id="refresh_tainoko">
+    $(document).ready(() => {
+      function set_img(img_tag) {
+        const imgtag = document.getElementById(`${img_tag}`)
+        const imgthumb = document.getElementById(`${img_tag}_thumb`)
+        const modal_wrap = document.getElementById(`${img_tag}_wrap`)
+
+        disco_key = 'NDk2NjE2MzQ3NTE4NzYzMDE5.GDARYL.YH6DZphvTJ7PZevxQVkWD2uiKWN6ef19cesZwU'
+        channel_id = {
+          'taino_maker': '928175590505340929',
+          'taino_iv': '740225181133570070',
+          'taino_oi': '804641398925557760',
+          'taino_curve': '771214422453911573'
+        }
+
+        fetch(`https://discord.com/api/v9/channels/${channel_id[img_tag]}/messages?limit=1`, { headers: { 'authorization': disco_key } })
+          .then((r) => r.json()).then(res => { taino_url = res[0]['embeds'][0]['image']['url'] })
+          .then(() => {
+            imgtag.src = taino_url
+            imgthumb.src = taino_url
+
+            imgthumb.addEventListener('mouseover', () => { modal_wrap.style.display = "block" })
+            imgthumb.addEventListener('mouseleave', () => { modal_wrap.style.display = "none" })
+          })
+      }
+
+      function refresh_taino() {
+        set_img('taino_oi')
+        set_img('taino_maker')
+        set_img('taino_iv')
+      }
+      refresh_taino()
+      setInterval(() => { refresh_taino() }, 5 * 60 * 1000)
+    })
+  </script>
+
+  <script>
+    // fetch(`${home_url}/coinalyze`).then((r) => r.json()).then(res => { coinalyze_pair = res.coinalyze_pair })
+    //   .then(() => {
+
+    //     multi_count = 0
+    //     document.querySelectorAll('.multi_row').forEach(multi => {
+    //       tx = document.createElement('input')
+    //       tx.className = 'multi_tx'
+    //       tx.id = `multi_${multi_count}_`
+    //       tx.value = getCookie(`multi_${multi_count}_`)
+
+    //       if (tx.value !== null && tx.value !== '') { draw_multi(multi_count, tx.value) }
+
+    //       multi.prepend(tx)
+    //       multi_count++
+    //     })
+
+    //     draw_multi('BTC', 'BTC')
+    //     draw_multi('ETH', 'ETH')
+
+    //     document.querySelectorAll('input').forEach(mt => {
+    //       mt.addEventListener('change', e => {
+    //         setCookie(`${mt.id}`, `${mt.value.toUpperCase()}`, 365)
+    //         draw_multi(mt.id.replace('multi_', '').replace('_', ''), mt.value)
+    //       })
+    //     })
+    //   })
+  </script>
+
+
+</body>
+
+</html>
